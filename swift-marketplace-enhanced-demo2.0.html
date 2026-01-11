@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swift Marketplace - Enhanced Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #1a1f35 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #60efff 0%, #0061ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(96, 239, 255, 0.3);
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 97, 255, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(96, 239, 255, 0.5);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(96, 239, 255, 0.1);
+            border: 1px solid rgba(96, 239, 255, 0.3);
+            color: #60efff;
+        }
+        
+        .verified-badge {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+        }
+        
+        .premium-badge {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+        }
+        
+        .product-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(96, 239, 255, 0.4);
+            box-shadow: 0 12px 40px rgba(96, 239, 255, 0.2);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.1), rgba(0, 97, 255, 0.1));
+        }
+        
+        /* Custom Alert Styles */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.95), rgba(0, 97, 255, 0.95));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px 24px;
+            box-shadow: 0 8px 32px rgba(0, 97, 255, 0.4);
+            z-index: 10000;
+            min-width: 320px;
+            max-width: 420px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        .custom-alert.removing {
+            animation: slideOut 0.3s ease-out;
+        }
+        
+        .custom-alert-success {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.95), rgba(0, 200, 100, 0.95));
+        }
+        
+        .custom-alert-warning {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.95), rgba(255, 140, 0, 0.95));
+        }
+        
+        .custom-alert-error {
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+        }
+        
+        .bid-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 140, 0, 0.05));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .bid-card:hover {
+            border-color: #ffd700;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+        }
+        
+        .investment-card {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.05), rgba(75, 0, 130, 0.05));
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .investment-card:hover {
+            border-color: #8a2be2;
+            box-shadow: 0 12px 40px rgba(138, 43, 226, 0.3);
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #60efff 0%, #0061ff 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        input, textarea, select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: white;
+            width: 100%;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #60efff;
+            background: rgba(96, 239, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(96, 239, 255, 0.1);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1f35 0%, #0a0f1c 100%);
+            border: 1px solid rgba(96, 239, 255, 0.3);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.1), rgba(0, 97, 255, 0.1));
+            color: #60efff;
+            border: 1px solid rgba(96, 239, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel" data-type="module">
+        const { useState, useEffect } = React;
+        
+        // Enhanced Mock Data
+        const VERIFIED_SELLERS = [
+            {
+                id: 'seller-1',
+                name: 'Tech Store MW',
+                businessName: 'Tech Store Malawi',
+                verified: true,
+                premium: true,
+                rating: 4.8,
+                totalSales: 324,
+                joinDate: '2024-03-15',
+                location: 'Lilongwe',
+                description: 'Leading electronics retailer in Lilongwe. KYC verified with National ID.',
+                specialties: ['Electronics', 'Phones', 'Laptops'],
+                idVerified: true,
+                selfieVerified: true,
+                referralCode: 'TECH-MW-001',
+                referralEarnings: 145000,
+                avatar: '👨‍💼'
+            },
+            {
+                id: 'seller-2',
+                name: 'Malawi Crafts',
+                businessName: 'Traditional Malawi Crafts',
+                verified: true,
+                premium: false,
+                rating: 4.9,
+                totalSales: 567,
+                joinDate: '2024-01-20',
+                location: 'Blantyre',
+                description: 'Authentic Malawian crafts and textiles. Family business since 1995.',
+                specialties: ['Crafts', 'Textiles', 'Traditional Wear'],
+                idVerified: true,
+                selfieVerified: true,
+                referralCode: 'CRAFT-BT-002',
+                referralEarnings: 89000,
+                avatar: '👩‍🎨'
+            },
+            {
+                id: 'seller-3',
+                name: 'Mzuzu Farms',
+                businessName: 'Mzuzu Agricultural Products',
+                verified: true,
+                premium: true,
+                rating: 5.0,
+                totalSales: 892,
+                joinDate: '2023-11-10',
+                location: 'Mzuzu',
+                description: 'Premium agricultural products from Northern Malawi.',
+                specialties: ['Food', 'Organic Products', 'Nuts'],
+                idVerified: true,
+                selfieVerified: true,
+                referralCode: 'FARM-MZ-003',
+                referralEarnings: 234000,
+                avatar: '👨‍🌾'
+            }
+        ];
+        
+        const MOCK_PRODUCTS = [
+            {
+                id: '1',
+                title: 'Samsung Galaxy A54 - 128GB',
+                price: 450000,
+                image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400',
+                seller: VERIFIED_SELLERS[0],
+                stock: 5,
+                location: 'Lilongwe',
+                condition: 'Brand New',
+                category: 'Electronics',
+                type: 'regular'
+            },
+            {
+                id: '2',
+                title: 'Chitenje Traditional Fabric - Premium',
+                price: 15000,
+                image: 'https://i.postimg.cc/brJ37BTd/Sunny-alfresco-dress.jpg',
+                seller: VERIFIED_SELLERS[1],
+                stock: 50,
+                location: 'Blantyre',
+                condition: 'New',
+                category: 'Fashion',
+                type: 'regular'
+            },
+            {
+                id: '3',
+                title: 'Macadamia Nuts - 1kg Premium',
+                price: 25000,
+                image: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400',
+                seller: VERIFIED_SELLERS[2],
+                stock: 100,
+                location: 'Mzuzu',
+                condition: 'Fresh',
+                category: 'Food',
+                type: 'regular'
+            }
+        ];
+        
+        const AUCTION_ITEMS = [
+            {
+                id: 'auction-1',
+                title: 'iPhone 13 Pro Max - 256GB (Excellent Condition)',
+                startingBid: 600000,
+                currentBid: 750000,
+                image: 'https://images.unsplash.com/photo-1632661674596-df8be070a5c5?w=400',
+                seller: VERIFIED_SELLERS[0],
+                endTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+                totalBids: 23,
+                watchers: 45,
+                condition: 'Excellent',
+                type: 'auction'
+            },
+            {
+                id: 'auction-2',
+                title: 'Antique Malawi Wood Carving Collection',
+                startingBid: 50000,
+                currentBid: 120000,
+                image: 'https://images.unsplash.com/photo-1582721478779-0ae163a0f2cb?w=400',
+                seller: VERIFIED_SELLERS[1],
+                endTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+                totalBids: 15,
+                watchers: 28,
+                condition: 'Vintage',
+                type: 'auction'
+            }
+        ];
+        
+        const INVESTMENT_OPPORTUNITIES = [
+            {
+                id: 'invest-1',
+                title: 'Expand Macadamia Processing Plant',
+                businessName: 'Mzuzu Farms',
+                seller: VERIFIED_SELLERS[2],
+                targetAmount: 5000000,
+                raisedAmount: 3750000,
+                minInvestment: 50000,
+                expectedReturn: '15-20% annually',
+                duration: '24 months',
+                investors: 45,
+                image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400',
+                description: 'Funding needed to expand our macadamia processing capacity by 300%. Proven track record with 892 successful sales.',
+                useOfFunds: ['New processing equipment', 'Storage expansion', 'Quality control lab'],
+                risks: 'Agricultural market fluctuations, weather dependency',
+                verified: true
+            },
+            {
+                id: 'invest-2',
+                title: 'Traditional Crafts Export Initiative',
+                businessName: 'Malawi Crafts',
+                seller: VERIFIED_SELLERS[1],
+                targetAmount: 2500000,
+                raisedAmount: 1875000,
+                minInvestment: 25000,
+                expectedReturn: '12-18% annually',
+                duration: '18 months',
+                investors: 32,
+                image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=400',
+                description: 'Expand our traditional crafts to international markets. Partnership with UK and US retailers confirmed.',
+                useOfFunds: ['Export licensing', 'Inventory expansion', 'International shipping setup'],
+                risks: 'Export market volatility, currency fluctuation',
+                verified: true
+            }
+        ];
+        
+        function SwiftMarketplace() {
+            const [currentView, setCurrentView] = useState('home');
+            const [selectedProduct, setSelectedProduct] = useState(null);
+            const [cart, setCart] = useState([]);
+            const [alerts, setAlerts] = useState([]);
+            const [showModal, setShowModal] = useState(null);
+            const [activeTab, setActiveTab] = useState('all');
+            const [userReferralCode, setUserReferralCode] = useState('');
+            const [referralEarnings, setReferralEarnings] = useState(0);
+            
+            // Custom Alert System
+            const showAlert = (message, type = 'success', icon = '✓') => {
+                const id = Date.now();
+                const newAlert = { id, message, type, icon };
+                setAlerts(prev => [...prev, newAlert]);
+                
+                setTimeout(() => {
+                    setAlerts(prev => prev.map(alert => 
+                        alert.id === id ? { ...alert, removing: true } : alert
+                    ));
+                    setTimeout(() => {
+                        setAlerts(prev => prev.filter(alert => alert.id !== id));
+                    }, 300);
+                }, 4000);
+            };
+            
+            // Custom Alert Component
+            function CustomAlert({ alert }) {
+                const typeClass = {
+                    success: 'custom-alert-success',
+                    warning: 'custom-alert-warning',
+                    error: 'custom-alert-error',
+                    info: ''
+                }[alert.type] || '';
+                
+                return (
+                    <div className={`custom-alert ${typeClass} ${alert.removing ? 'removing' : ''}`}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ fontSize: '24px' }}>{alert.icon}</div>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+                                    {alert.type === 'success' ? 'Success!' : 
+                                     alert.type === 'warning' ? 'Warning' : 
+                                     alert.type === 'error' ? 'Error' : 'Info'}
+                                </div>
+                                <div style={{ fontSize: '14px', opacity: 0.95 }}>
+                                    {alert.message}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Header Component
+            function Header() {
+                return (
+                    <header style={{
+                        background: 'rgba(10, 15, 28, 0.9)',
+                        backdropFilter: 'blur(20px)',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                        padding: '20px 0',
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 1000
+                    }}>
+                        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }} onClick={() => setCurrentView('home')}>
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    background: 'linear-gradient(135deg, #60efff 0%, #0061ff 100%)',
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '24px',
+                                    boxShadow: '0 4px 20px rgba(96, 239, 255, 0.4)'
+                                }}>
+                                    🛍️
+                                </div>
+                                <div>
+                                    <h1 style={{ 
+                                        fontSize: '24px', 
+                                        fontWeight: '800', 
+                                        fontFamily: 'Sora, sans-serif',
+                                        background: 'linear-gradient(135deg, #60efff 0%, #0061ff 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent'
+                                    }}>
+                                        Swift Marketplace
+                                    </h1>
+                                </div>
+                            </div>
+                            
+                            <nav style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                <button className="tab-button" onClick={() => setCurrentView('home')}>Shop</button>
+                                <button className="tab-button" onClick={() => setCurrentView('auctions')}>Auctions </button>
+                                <button className="tab-button" onClick={() => setCurrentView('investments')}>Invest</button>
+                                <button className="tab-button" onClick={() => setCurrentView('sellers')}>Sellers</button>
+                                <button className="tab-button" onClick={() => setCurrentView('referrals')}>
+                                    Referrals 
+                                </button>
+                            </nav>
+                        </div>
+                    </header>
+                );
+            }
+            
+            // Seller Verification Modal
+            function SellerVerificationModal({ seller, onClose }) {
+                return (
+                    <div className="modal-overlay" onClick={onClose}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()}>
+                            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                                <div style={{ fontSize: '64px', marginBottom: '16px' }}>{seller.avatar}</div>
+                                <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
+                                    {seller.businessName}
+                                </h2>
+                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                    <span className="badge verified-badge">✓ Verified Seller</span>
+                                    {seller.premium && <span className="badge premium-badge">⭐ Premium</span>}
+                                    <span className="badge">📍 {seller.location}</span>
+                                </div>
+                            </div>
+                            
+                            <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
+                                <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px' }}>
+                                    Verification Status
+                                </h3>
+                                <div style={{ display: 'grid', gap: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>National ID Verified</span>
+                                        <span style={{ color: '#00ff88', fontWeight: '700' }}>✓ Verified</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Selfie Match</span>
+                                        <span style={{ color: '#00ff88', fontWeight: '700' }}>✓ Verified</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Phone Verified</span>
+                                        <span style={{ color: '#00ff88', fontWeight: '700' }}>✓ Verified</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Member Since</span>
+                                        <span style={{ fontWeight: '600' }}>{new Date(seller.joinDate).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
+                                <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px' }}>
+                                    Performance Stats
+                                </h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                    <div>
+                                        <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
+                                            Total Sales
+                                        </div>
+                                        <div style={{ fontSize: '24px', fontWeight: '800', color: '#60efff' }}>
+                                            {seller.totalSales}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
+                                            Rating
+                                        </div>
+                                        <div style={{ fontSize: '24px', fontWeight: '800', color: '#ffaa00' }}>
+                                            ★ {seller.rating}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style={{ marginBottom: '16px' }}>
+                                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                                    Specialties
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                    {seller.specialties.map((spec, i) => (
+                                        <span key={i} className="badge">{spec}</span>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', lineHeight: '1.6', marginBottom: '24px' }}>
+                                {seller.description}
+                            </p>
+                            
+                            <button className="btn-primary" style={{ width: '100%' }} onClick={onClose}>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Sellers Page
+            function SellersPage() {
+                return (
+                    <div style={{ padding: '60px 32px', maxWidth: '1200px', margin: '0 auto' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                            <h2 style={{
+                                fontSize: '48px',
+                                fontWeight: '800',
+                                fontFamily: 'Sora, sans-serif',
+                                marginBottom: '16px'
+                            }}>
+                                Verified Sellers
+                            </h2>
+                            <p style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                                All sellers verified with National ID and selfie match
+                            </p>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gap: '24px' }}>
+                            {VERIFIED_SELLERS.map(seller => (
+                                <div key={seller.id} className="glass-card" style={{ padding: '32px' }}>
+                                    <div style={{ display: 'flex', gap: '24px', alignItems: 'start' }}>
+                                        <div style={{ fontSize: '64px' }}>{seller.avatar}</div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+                                                <div>
+                                                    <h3 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
+                                                        {seller.businessName}
+                                                    </h3>
+                                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                                                        <span className="badge verified-badge">✓ ID Verified</span>
+                                                        {seller.premium && <span className="badge premium-badge">⭐ Premium</span>}
+                                                        <span className="badge">📍 {seller.location}</span>
+                                                    </div>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <div style={{ fontSize: '24px', fontWeight: '800', color: '#ffaa00' }}>
+                                                        ★ {seller.rating}
+                                                    </div>
+                                                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
+                                                        {seller.totalSales} sales
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '16px', lineHeight: '1.6' }}>
+                                                {seller.description}
+                                            </p>
+                                            
+                                            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                                                {seller.specialties.map((spec, i) => (
+                                                    <span key={i} className="badge">{spec}</span>
+                                                ))}
+                                            </div>
+                                            
+                                            <div style={{ display: 'flex', gap: '12px' }}>
+                                                <button 
+                                                    className="btn-primary"
+                                                    onClick={() => setShowModal({ type: 'seller', data: seller })}
+                                                >
+                                                    View Verification
+                                                </button>
+                                                <button 
+                                                    style={{
+                                                        background: 'rgba(255, 255, 255, 0.05)',
+                                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                        padding: '12px 24px',
+                                                        borderRadius: '12px',
+                                                        color: 'white',
+                                                        fontWeight: '600',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(seller.referralCode);
+                                                        showAlert(`Referral code ${seller.referralCode} copied!`, 'success', '📋');
+                                                    }}
+                                                >
+                                                    Get Referral Code
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Auctions Page
+            function AuctionsPage() {
+                return (
+                    <div style={{ padding: '60px 32px', maxWidth: '1400px', margin: '0 auto' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                            <h2 style={{
+                                fontSize: '48px',
+                                fontWeight: '800',
+                                fontFamily: 'Sora, sans-serif',
+                                marginBottom: '16px'
+                            }}>
+                                Live Auctions 🔥
+                            </h2>
+                            <p style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                                Bid on premium items from verified sellers
+                            </p>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '32px' }}>
+                            {AUCTION_ITEMS.map(item => {
+                                const timeLeft = Math.ceil((item.endTime - new Date()) / (1000 * 60 * 60 * 24));
+                                return (
+                                    <div key={item.id} className="bid-card">
+                                        <img src={item.image} alt={item.title} style={{
+                                            width: '100%',
+                                            height: '250px',
+                                            objectFit: 'cover',
+                                            borderRadius: '12px',
+                                            marginBottom: '16px'
+                                        }} />
+                                        
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                            <span className="badge verified-badge">✓ {item.seller.name}</span>
+                                            <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.1)', borderColor: 'rgba(255, 215, 0, 0.3)', color: '#ffd700' }}>
+                                                🔥 {timeLeft} days left
+                                            </span>
+                                        </div>
+                                        
+                                        <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', lineHeight: '1.4' }}>
+                                            {item.title}
+                                        </h3>
+                                        
+                                        <div style={{ marginBottom: '16px' }}>
+                                            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
+                                                Current Bid
+                                            </div>
+                                            <div style={{ fontSize: '32px', fontWeight: '800', color: '#ffd700' }}>
+                                                MWK {item.currentBid.toLocaleString()}
+                                            </div>
+                                            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
+                                                Starting: MWK {item.startingBid.toLocaleString()}
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', fontSize: '13px' }}>
+                                            <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                                👥 {item.totalBids} bids
+                                            </span>
+                                            <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                                👁️ {item.watchers} watching
+                                            </span>
+                                        </div>
+                                        
+                                        <button 
+                                            className="btn-primary" 
+                                            style={{ width: '100%' }}
+                                            onClick={() => {
+                                                const newBid = item.currentBid + 10000;
+                                                showAlert(`Bid placed: MWK ${newBid.toLocaleString()}! You're currently winning!`, 'success', '🎉');
+                                            }}
+                                        >
+                                            Place Bid
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Investments Page
+            function InvestmentsPage() {
+                return (
+                    <div style={{ padding: '60px 32px', maxWidth: '1400px', margin: '0 auto' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                            <h2 style={{
+                                fontSize: '48px',
+                                fontWeight: '800',
+                                fontFamily: 'Sora, sans-serif',
+                                marginBottom: '16px'
+                            }}>
+                                Investment Opportunities
+                            </h2>
+                            <p style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                                Fund verified businesses and earn returns
+                            </p>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gap: '32px' }}>
+                            {INVESTMENT_OPPORTUNITIES.map(invest => {
+                                const progressPercent = (invest.raisedAmount / invest.targetAmount) * 100;
+                                return (
+                                    <div key={invest.id} className="investment-card">
+                                        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '0' }}>
+                                            <img src={invest.image} alt={invest.title} style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover'
+                                            }} />
+                                            
+                                            <div style={{ padding: '32px' }}>
+                                                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                                                    <span className="badge verified-badge">✓ Verified Business</span>
+                                                    <span className="badge premium-badge">⭐ {invest.seller.name}</span>
+                                                </div>
+                                                
+                                                <h3 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '12px' }}>
+                                                    {invest.title}
+                                                </h3>
+                                                
+                                                <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '20px', lineHeight: '1.6' }}>
+                                                    {invest.description}
+                                                </p>
+                                                
+                                                <div style={{ marginBottom: '20px' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                        <span style={{ fontSize: '14px', fontWeight: '600' }}>
+                                                            MWK {invest.raisedAmount.toLocaleString()} raised
+                                                        </span>
+                                                        <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                                                            {progressPercent.toFixed(0)}%
+                                                        </span>
+                                                    </div>
+                                                    <div className="progress-bar">
+                                                        <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
+                                                    </div>
+                                                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginTop: '4px' }}>
+                                                        Goal: MWK {invest.targetAmount.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                                
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                                                    <div>
+                                                        <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
+                                                            Expected Return
+                                                        </div>
+                                                        <div style={{ fontSize: '16px', fontWeight: '700', color: '#00ff88' }}>
+                                                            {invest.expectedReturn}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
+                                                            Duration
+                                                        </div>
+                                                        <div style={{ fontSize: '16px', fontWeight: '700' }}>
+                                                            {invest.duration}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
+                                                            Investors
+                                                        </div>
+                                                        <div style={{ fontSize: '16px', fontWeight: '700' }}>
+                                                            {invest.investors}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div style={{ display: 'flex', gap: '12px' }}>
+                                                    <button 
+                                                        className="btn-primary"
+                                                        onClick={() => setShowModal({ type: 'invest', data: invest })}
+                                                    >
+                                                        Invest Now
+                                                    </button>
+                                                    <button 
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.05)',
+                                                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                            padding: '12px 24px',
+                                                            borderRadius: '12px',
+                                                            color: 'white',
+                                                            fontWeight: '600',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                        onClick={() => setShowModal({ type: 'invest-details', data: invest })}
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Investment Details Modal
+            function InvestmentDetailsModal({ invest, onClose }) {
+                return (
+                    <div className="modal-overlay" onClick={onClose}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()}>
+                            <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '24px' }}>
+                                Investment Details
+                            </h2>
+                            
+                            <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
+                                <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px' }}>
+                                    Use of Funds
+                                </h3>
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                    {invest.useOfFunds.map((item, i) => (
+                                        <li key={i} style={{ 
+                                            padding: '12px 0', 
+                                            borderBottom: i < invest.useOfFunds.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px'
+                                        }}>
+                                            <span style={{ color: '#60efff' }}>✓</span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            
+                            <div className="glass-card" style={{ padding: '24px', marginBottom: '24px', background: 'rgba(255, 170, 0, 0.05)' }}>
+                                <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '12px', color: '#ffaa00' }}>
+                                    ⚠️ Risk Disclosure
+                                </h3>
+                                <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.8)', lineHeight: '1.6' }}>
+                                    {invest.risks}
+                                </p>
+                            </div>
+                            
+                            <button className="btn-primary" style={{ width: '100%' }} onClick={onClose}>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Invest Modal
+            function InvestModal({ invest, onClose }) {
+                const [amount, setAmount] = useState(invest.minInvestment);
+                
+                return (
+                    <div className="modal-overlay" onClick={onClose}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()}>
+                            <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '24px' }}>
+                                Invest in {invest.title}
+                            </h2>
+                            
+                            <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
+                                <div style={{ marginBottom: '16px' }}>
+                                    <label style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                                        Investment Amount (MWK)
+                                    </label>
+                                    <input 
+                                        type="number" 
+                                        value={amount}
+                                        onChange={e => setAmount(parseInt(e.target.value))}
+                                        min={invest.minInvestment}
+                                        step={10000}
+                                    />
+                                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginTop: '4px' }}>
+                                        Minimum: MWK {invest.minInvestment.toLocaleString()}
+                                    </div>
+                                </div>
+                                
+                                <div style={{ background: 'rgba(0, 255, 136, 0.05)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(0, 255, 136, 0.2)' }}>
+                                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '4px' }}>
+                                        Estimated Returns ({invest.expectedReturn})
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: '800', color: '#00ff88' }}>
+                                        MWK {(amount * 0.175).toLocaleString()} - {(amount * 0.2).toLocaleString()}
+                                    </div>
+                                    <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginTop: '4px' }}>
+                                        Over {invest.duration}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button 
+                                    className="btn-primary" 
+                                    style={{ flex: 1 }}
+                                    onClick={() => {
+                                        showAlert(`Investment of MWK ${amount.toLocaleString()} confirmed! You'll receive updates via email.`, 'success', '🎉');
+                                        onClose();
+                                    }}
+                                >
+                                    Confirm Investment
+                                </button>
+                                <button 
+                                    style={{
+                                        background: 'rgba(255, 255, 255, 0.05)',
+                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                        padding: '14px 32px',
+                                        borderRadius: '12px',
+                                        color: 'white',
+                                        fontWeight: '600',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={onClose}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Referrals Page
+            function ReferralsPage() {
+                return (
+                    <div style={{ padding: '60px 32px', maxWidth: '1000px', margin: '0 auto' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                            <h2 style={{
+                                fontSize: '48px',
+                                fontWeight: '800',
+                                fontFamily: 'Sora, sans-serif',
+                                marginBottom: '16px'
+                            }}>
+                                Earn with Referrals 💰
+                            </h2>
+                            <p style={{ fontSize: '18px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                                Get 5% commission on every sale from your referrals
+                            </p>
+                        </div>
+                        
+                        <div className="glass-card" style={{ padding: '40px', marginBottom: '32px' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                                <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '8px' }}>
+                                    Your Referral Earnings
+                                </div>
+                                <div style={{ fontSize: '48px', fontWeight: '800', color: '#60efff', marginBottom: '16px' }}>
+                                    MWK {referralEarnings.toLocaleString()}
+                                </div>
+                                <button className="btn-primary">
+                                    Withdraw Earnings
+                                </button>
+                            </div>
+                            
+                            <div style={{ background: 'rgba(96, 239, 255, 0.05)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(96, 239, 255, 0.2)' }}>
+                                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
+                                    Your Referral Code
+                                </div>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    <input 
+                                        type="text"
+                                        value={userReferralCode || 'SWIFT-' + Math.random().toString(36).substring(2, 8).toUpperCase()}
+                                        readOnly
+                                        style={{ flex: 1, background: 'rgba(255, 255, 255, 0.1)' }}
+                                    />
+                                    <button 
+                                        className="btn-primary"
+                                        onClick={() => {
+                                            const code = userReferralCode || 'SWIFT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                                            setUserReferralCode(code);
+                                            navigator.clipboard.writeText(code);
+                                            showAlert('Referral code copied to clipboard!', 'success', '📋');
+                                        }}
+                                    >
+                                        Copy Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="glass-card" style={{ padding: '32px', marginBottom: '32px' }}>
+                            <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '20px' }}>
+                                How It Works
+                            </h3>
+                            <div style={{ display: 'grid', gap: '16px' }}>
+                                <div style={{ display: 'flex', gap: '16px', alignItems: 'start' }}>
+                                    <div style={{ fontSize: '32px' }}>1️⃣</div>
+                                    <div>
+                                        <div style={{ fontWeight: '600', marginBottom: '4px' }}>Share Your Code</div>
+                                        <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                                            Share your referral code with friends, family, or on social media
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', gap: '16px', alignItems: 'start' }}>
+                                    <div style={{ fontSize: '32px' }}>2️⃣</div>
+                                    <div>
+                                        <div style={{ fontWeight: '600', marginBottom: '4px' }}>They Register & Buy</div>
+                                        <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                                            When someone uses your code to sign up and makes a purchase
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', gap: '16px', alignItems: 'start' }}>
+                                    <div style={{ fontSize: '32px' }}>3️⃣</div>
+                                    <div>
+                                        <div style={{ fontWeight: '600', marginBottom: '4px' }}>You Earn 5%</div>
+                                        <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                                            Receive 5% commission on every purchase they make (lifetime!)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="glass-card" style={{ padding: '32px' }}>
+                            <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '20px' }}>
+                                Top Referrers This Month
+                            </h3>
+                            <div style={{ display: 'grid', gap: '16px' }}>
+                                {VERIFIED_SELLERS.map((seller, i) => (
+                                    <div key={seller.id} style={{ 
+                                        display: 'flex', 
+                                        justifyContent: 'space-between', 
+                                        alignItems: 'center',
+                                        padding: '16px',
+                                        background: 'rgba(255, 255, 255, 0.02)',
+                                        borderRadius: '12px'
+                                    }}>
+                                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                            <div style={{ fontSize: '24px', fontWeight: '800', color: '#60efff', width: '32px' }}>
+                                                #{i + 1}
+                                            </div>
+                                            <div style={{ fontSize: '24px' }}>{seller.avatar}</div>
+                                            <div>
+                                                <div style={{ fontWeight: '600' }}>{seller.name}</div>
+                                                <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
+                                                    Code: {seller.referralCode}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontSize: '18px', fontWeight: '800', color: '#00ff88' }}>
+                                                MWK {seller.referralEarnings.toLocaleString()}
+                                            </div>
+                                            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)' }}>
+                                                This month
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Products Grid (simplified for space)
+            function ProductsGrid() {
+                return (
+                    <div style={{ padding: '60px 32px', maxWidth: '1400px', margin: '0 auto' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                            <h2 style={{ fontSize: '48px', fontWeight: '800', fontFamily: 'Sora, sans-serif', marginBottom: '16px' }}>
+                                Featured Products
+                            </h2>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '32px' }}>
+                            {MOCK_PRODUCTS.map(product => (
+                                <div key={product.id} className="product-card">
+                                    <img src={product.image} alt={product.title} className="product-image" />
+                                    <div style={{ padding: '20px' }}>
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                            <span className="badge verified-badge">✓ {product.seller.name}</span>
+                                            {product.seller.premium && <span className="badge premium-badge">⭐ Premium</span>}
+                                        </div>
+                                        
+                                        <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '12px' }}>
+                                            {product.title}
+                                        </h3>
+                                        
+                                        <div style={{ fontSize: '28px', fontWeight: '800', color: '#60efff', marginBottom: '16px' }}>
+                                            MWK {product.price.toLocaleString()}
+                                        </div>
+                                        
+                                        <button 
+                                            className="btn-primary" 
+                                            style={{ width: '100%' }}
+                                            onClick={() => showAlert('Added to cart! 🛒', 'success', '✓')}
+                                        >
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            }
+            
+            // Main Render
+            return (
+                <div>
+                    <Header />
+                    
+                    {currentView === 'home' && <ProductsGrid />}
+                    {currentView === 'sellers' && <SellersPage />}
+                    {currentView === 'auctions' && <AuctionsPage />}
+                    {currentView === 'investments' && <InvestmentsPage />}
+                    {currentView === 'referrals' && <ReferralsPage />}
+                    
+                    {/* Modals */}
+                    {showModal?.type === 'seller' && (
+                        <SellerVerificationModal seller={showModal.data} onClose={() => setShowModal(null)} />
+                    )}
+                    {showModal?.type === 'invest' && (
+                        <InvestModal invest={showModal.data} onClose={() => setShowModal(null)} />
+                    )}
+                    {showModal?.type === 'invest-details' && (
+                        <InvestmentDetailsModal invest={showModal.data} onClose={() => setShowModal(null)} />
+                    )}
+                    
+                    {/* Custom Alerts */}
+                    <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 10000 }}>
+                        {alerts.map(alert => (
+                            <CustomAlert key={alert.id} alert={alert} />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+        
+        ReactDOM.render(<SwiftMarketplace />, document.getElementById('root'));
+    </script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</body>
+</html>
